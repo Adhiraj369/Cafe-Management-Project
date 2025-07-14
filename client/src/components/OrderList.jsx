@@ -20,7 +20,7 @@ const KitchenTicket = React.forwardRef(({ order, orders, dishTypes }, ref) => (
         <div key={index} className="mb-2">
           <div className="font-semibold">
             {item.quantity}x {item.dishName}
-            {item.dishVariants && item.dishVariants.variantName && (
+            {item.dishVariants?.variantName && (
               <div className="text-sm">({item.dishVariants.variantName})</div>
             )}
             {dishTypes[item.dishName] === "NON-VEG" && (
@@ -273,7 +273,7 @@ export default function OrderList({ order, refetchOrders }) {
   };
 
   useEffect(() => {
-    setOrders([...order.orderList]);
+    setOrders(Array.isArray(order.orderList) ? [...order.orderList] : []);
     setTotalPrice(order.totalPrice);
     setIsPrintReady(!!order._id && order.orderList.length > 0);
   }, [order]);
@@ -608,7 +608,7 @@ export default function OrderList({ order, refetchOrders }) {
                         <span className="ml-2 w-3 h-3 bg-red rounded-full"></span>
                       )}
                     </div>
-                    {item.dishAddOns && item.dishAddOns.length > 0 && (
+                    {Array.isArray(item.dishAddOns) && item.dishAddOns.length > 0 && (
                       <div
                         className="flex flex-wrap gap-1 mt-1 relative"
                         onClick={() =>
