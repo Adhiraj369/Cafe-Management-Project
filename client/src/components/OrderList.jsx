@@ -202,6 +202,12 @@ export default function OrderList({ order, refetchOrders }) {
 
       const config = qz.configs.create("TVS-E RP 3230 ABW");
 
+      if (!ref.current?.innerHTML) {
+       console.error("Empty content to print");
+       setPrintError("Empty content to print");
+       return;
+      }
+
       const htmlContent = `
         <html>
         <head><title>${title}</title></head>
@@ -269,7 +275,7 @@ export default function OrderList({ order, refetchOrders }) {
       return;
     }
     await fetchGSTNumber();
-    printWithQZ(billRef, "Bill");
+    setTimeout(() => printWithQZ(billRef, "Bill"), 100); 
   };
 
   useEffect(() => {
@@ -373,6 +379,12 @@ export default function OrderList({ order, refetchOrders }) {
       });
 
       if (response.ok) {
+        
+        if (!orders[itemIndex]) {
+          console.error("Invalid itemIndex:", itemIndex);
+          return;
+        }
+        
         const updatedOrders = [...orders];
         updatedOrders[itemIndex].status = newStatus;
         setOrders(updatedOrders);
@@ -396,6 +408,11 @@ export default function OrderList({ order, refetchOrders }) {
       const unitPrice = item.price / item.quantity;
       const newTotalItemPrice = unitPrice * newQuantity;
 
+      if (!orders[itemIndex]) {
+        console.error("Invalid itemIndex:", itemIndex);
+        return;
+      }
+      
       const updatedOrders = [...orders];
       updatedOrders[itemIndex].quantity = newQuantity;
       updatedOrders[itemIndex].price = newTotalItemPrice;
@@ -431,6 +448,11 @@ export default function OrderList({ order, refetchOrders }) {
     e.stopPropagation();
 
     try {
+      if (!orders[itemIndex]) {
+        console.error("Invalid itemIndex:", itemIndex);
+        return;
+      }
+      
       const updatedOrders = orders.filter((_, idx) => idx !== itemIndex);
       setOrders(updatedOrders);
       setActiveDropdown(null);
@@ -463,9 +485,18 @@ export default function OrderList({ order, refetchOrders }) {
     e.stopPropagation();
 
     try {
+      if (!orders[itemIndex]) {
+        console.error("Invalid itemIndex:", itemIndex);
+        return;
+      }
+      
       const updatedOrders = [...orders];
       const item = updatedOrders[itemIndex];
-      const addonPrice = item.dishAddOns[addonIndex].addOnPrice;
+      
+      const addon = item.dishAddOns?.[addonIndex];
+      if (!addon) return console.error('Addon not found');
+      const addonPrice = addon.addOnPrice;
+      
       item.dishAddOns.splice(addonIndex, 1);
       item.price -= addonPrice * item.quantity;
 
